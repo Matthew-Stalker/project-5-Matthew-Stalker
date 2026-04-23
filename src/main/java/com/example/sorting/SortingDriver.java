@@ -8,69 +8,68 @@ import java.util.stream.IntStream;
 public class SortingDriver {
 
     public static void main(String[] args) {
+        int arraySize = 10000;
 
-        // Generate array of random Integers
-        Integer[] arr = IntStream.generate(() -> (int) (Math.random() * 50000))
+        // 1. Generate RANDOM array
+        Integer[] randomArr = IntStream.generate(() -> (int) (Math.random() * 50000))
                 .boxed()
-                .limit(10000)
+                .limit(arraySize)
                 .toArray(Integer[]::new);
 
-        Integer[] copy1 = copyArray(arr);
-        Integer[] copy2 = copyArray(arr);
-        Integer[] copy3 = copyArray(arr);
+        // 2. Generate SORTED array (0 to 9999)
+        Integer[] sortedArr = IntStream.range(0, arraySize)
+                .boxed()
+                .toArray(Integer[]::new);
 
-        System.out.println("\nUnsorted data...");
-        printFirstTenOfArray(arr);
+        // 3. Generate REVERSE SORTED array (10000 down to 1)
+        Integer[] reverseArr = IntStream.iterate(arraySize, i -> i - 1)
+                .limit(arraySize)
+                .boxed()
+                .toArray(Integer[]::new);
+
+        // Run the tests
+        System.out.println("=========================================");
+        System.out.println("        TESTING RANDOM ARRAY             ");
+        System.out.println("=========================================");
+        runPerformanceTest(randomArr);
+
+        System.out.println("\n=========================================");
+        System.out.println("        TESTING SORTED ARRAY             ");
+        System.out.println("=========================================");
+        runPerformanceTest(sortedArr);
+
+        System.out.println("\n=========================================");
+        System.out.println("      TESTING REVERSE SORTED ARRAY       ");
+        System.out.println("=========================================");
+        runPerformanceTest(reverseArr);
+    }
+
+    private static void runPerformanceTest(Integer[] sourceArray) {
+        Integer[] copy1 = copyArray(sourceArray);
+        Integer[] copy2 = copyArray(sourceArray);
+        Integer[] copy3 = copyArray(sourceArray);
 
         StopWatch stopWatch = new StopWatch();
 
-        System.out.println("\nGnome Sort...");
+        // Gnome Sort
         stopWatch.start("Gnome Sort");
         SortingUtility.gnomeSort(copy1);
         stopWatch.stop();
-        printFirstTenOfArray(copy1);
-        System.out.println("Time elapsed: " + stopWatch.getLastTaskTimeNanos() / 1_000_000.0 + " ms");
 
-        System.out.println("\nCocktail Shaker Sort...");
+        // Cocktail Shaker Sort
         stopWatch.start("Cocktail Shaker Sort");
         SortingUtility.cocktailShakerSort(copy2);
         stopWatch.stop();
-        printFirstTenOfArray(copy2);
-        System.out.println("Time elapsed: " + stopWatch.getLastTaskTimeNanos() / 1_000_000.0 + " ms");
 
-        System.out.println("\nShell Sort...");
+        // Shell Sort
         stopWatch.start("Shell Sort");
         SortingUtility.shellSort(copy3);
         stopWatch.stop();
-        printFirstTenOfArray(copy3);
-        System.out.println("Time elapsed: " + stopWatch.getLastTaskTimeNanos() / 1_000_000.0 + " ms");
 
-        System.out.println("\n" + stopWatch.prettyPrint());
-    }
-
-    private static <T> void printFirstTenOfArray(T[] obj) {
-
-        if (obj != null) {
-            int counter = 1;
-            System.out.println("\nFirst 10 of Array...");
-
-            for (T i : obj) {
-                System.out.println(counter + ": " + i.toString());
-                if (counter >= 10) {
-                    break;
-                }
-                counter++;
-            }
-
-        } else {
-            System.out.println("Array is null.");
-        }
+        System.out.println(stopWatch.prettyPrint());
     }
 
     private static <T> T[] copyArray(T[] obj) {
-
-        T[] copy = (T[]) Arrays.copyOf(obj, obj.length);
-        return copy;
+        return (T[]) Arrays.copyOf(obj, obj.length);
     }
-
 }
